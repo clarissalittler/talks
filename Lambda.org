@@ -1,0 +1,221 @@
+#+TITLE: A Short Introduction to the Lambda Calculus
+#+AUTHOR: Clarissa Littler
+
+Run the following commands to start the show!
+elisp:org-show-mode
+elisp:org-show-start-slideshow
+* Title slide							      :slide:
+#+BEGIN_SRC emacs-lisp-slide
+(org-show-animate '("A Bit of Lambda Calculus" "Clarissa Littler"))
+#+END_SRC
+* What is the lambda calculus?					      :slide:
+
+A universal model of computation:
+
+1. A system that can mimic any programming language
+2. ...but is simpler
+3. ...and can be evaluated by hand
+
+like Turing machines, but even simpler
+* Why did/do we need it?					      :slide:
+  The lambda calculus predates most models of computation: about as old as Turing machines
+
+  It provided a clean, simple, way to understand what functions were definable as /computation/
+
+  It's still useful as:
+  + a minimalist programming language
+  + a target of compilation
+  + an experimental playground 
+* What does it look like?					      :slide:
+Three syntactic forms:
++ variables :: $v$
++ function creation :: $\lambda\, v.\ l$
++ function application :: $l\ l$
+
+That's it!
+* How does it work?						      :slide:
+  Only one rule of computation: functional application 
+  (also called $\beta$ reduction)
+  
+  \begin{displaymath}
+    (\lambda v.\, l_b) l_a = l_b[l_a / v]
+  \end{displaymath}
+* Small examples						      :slide:
+  \begin{align*}
+    (\lambda x.\, x) l &:= l \\
+    (\lambda c.\, \lambda x.\, c) l &:= \lambda x.\, l  
+  \end{align*}
+* Substitution							      :slide:
+  Substitution is *really* hard!
+
+  Need to avoid capture!
+
+  $(\lambda x.\, (\lambda y.\, x)) y \neq (\lambda y.\, y)$ 
+* Capture avoiding substitution
+* Building a language						      :slide:
+From functions we can build:
+
+1. booleans
+2. if-statements
+3. numbers
+4. for-loops
+5. ...
+* Booleans							      :slide:
+We represent true and false as /functions/
+
+\begin{align*}
+\text{true} &:= \lambda t.\, \lambda f.\, t \\
+\text{false} &:= \lambda t.\, \lambda f.\, f
+\end{align*}
+
+* Booleans are if statements					      :slide:
+if-expression:
+$$\text{if} := \lambda b.\, \lambda t.\, \lambda f.\, b\,t\,f$$ 
+
+examples:
+\begin{align*}
+\text{if}(\text{true})(x)(y) &= \text{true}(x)(y) = x \\
+\text{if}(\text{false})(x)(y) &= \text{false}(x)(y) = y
+\end{align*}
+
+the choice is built into the booleans themselves
+q* Operations on booleans			     :slide:
+\begin{align*}
+\text{not} &:= \lambda b.\, \lambda t.\, \lambda f. b(f)(t) \\
+ b_1\ \text{and}\ b_2 &:= \lambda t.\, \lambda f.\, b_1(b_2(t)(f))(f) \\
+ b_1\ \text{or}\ b_2 &:= \lambda t.\, \lambda f.\, b_1(t)(b_2(t)(f)) \\
+ \text{true}\land\text{false} &= \lambda t.\, \lambda f.\, \text{true}(\text{false}(t)(f))(f) \\
+    &= \lambda t.\, \lambda f.\, \text{false}(t)(f) \\
+    &= \lambda t.\, \lambda f.\, f \\
+    &= \text{false}
+\end{align*}
+
+* Numbers							      :slide:
+Unary encodings of numbers: every number is $0$ or $1+n$
+
+\begin{align*}
+ 0 &:= \lambda s.\, \lambda z. \, z \\
+ S &:= \lambda n.\, \lambda s.\, \lambda z.\, s(n(s)(z)) \\
+ 1 &:= S(0) = \lambda s.\, \lambda z.\, s(z) \\
+ 2 &:= S(1) = \lambda s.\, \lambda z. s(1(s)(z))\\
+   & = \lambda s.\, \lambda z. s(s(z)) 
+\end{align*}
+
+* Numbers are for-loops						      :slide:
+Addition of numbers:
+
+\begin{align*}
+m + n &:= m(S)(n) \\
+1 + 1 &= 1(S)(1) = S(1) = 2 \\
+2 + 2 &= 2(S)(2) = S(S(2)) = 4 \\
+3 + 5 &= 3(S)(5) = S(S(S(5))) = 8
+\end{align*}
+ 
+Multiplication is repeated addition:
+
+\begin{align*}
+ m*n &:= m(n(S))(0) \\
+ 1*1 &= 1(1(S))(0) \\
+     &= 1(S)(0) = S(0) = 1 \\
+ 2*2 &= 2(2(S))(0) \\
+     &= 2(S)(2(S)(0)) = 2(S)(2) = 4  
+\end{align*}
+
+Subtraction by 1 (the *worst*): 
+
+\begin{align*}
+\text{id} &= \lambda u. u \\
+\text{const}(c) &= \lambda x. z \\
+\text{pred}(n) &:= \lambda s.\, \lambda z.\, (n (\lambda x.\, \lambda y.\, y (x s)) (const z)) id \\
+pred(0) &= \lambda s.\, \lambda z.\, 0(f)(const z) id \\
+        &= \lambda s.\, \lambda z. (const z)(id) \\
+        &= \lambda s.\, \lambda z. z = 0 \\
+pred(1) &= \lambda s.\, \lambda z.\, 1(f)(const z) id \\
+        &= \lambda s.\, \lambda z.\, f(const z) id \\
+        &= \lambda s.\, \lambda z.\, (\lambda z'.\, z' ((const z) s)) id\\
+        &= \lambda s.\, \lambda z.\, id z \\
+        &= \lambda s.\, \lambda z.\, z = 0 \\
+pred(2) &= \lambda s.\, \lambda z.\, 2(f)(const z) id \\
+        &= \lambda s.\, \lambda z.\, f(f(const z)) id \\
+        &= \lambda s.\, \lambda z.\, f(\lambda y.\, y ((const z) s)) id \\
+        &= \lambda s.\, \lambda z.\, f(\lambda y.\, y z) id \\
+        &= \lambda s.\, \lambda z.\, (\lambda y'\, y' ((\lambda y.\, y z) s) id \\
+        &= \lambda s.\, \lambda z.\, (\lambda y'\, y' (s z)) id \\
+        &= \lambda s.\, \lambda z.\, s z \\
+\end{align*}
+
+* Loops in the lambda calculus
+How do we do general loops in the lambda calculus?
+
+The /Y-combinator/:
+
+$$ Y := \lambda f.\, (\lambda x.\, f(x(x)))(\lambda x.\, f(x(x)))$$
+
+Looks weird *but*
+
+\begin{align*}
+Y(g) &= (\lambda x.\, g(x(x)))(\lambda x.\, g(x(x))) \\
+     &= g((\lambda x.\, g(x(x)))(\lambda x.\, g(x(x)))) \\
+     &= g(Y(g)) 
+\end{align*}
+
+We now have recursion!
+* Using loops in the lambda calculus
+First an operation on numbers:
+
+Testing for 0:
+$$\text{isZero} := \lambda n.\, n(\lambda x.\, \text{false})(\text{true})$$
+
+Factorial function:
+ \begin{align*}
+\text{factish} &:= \lambda g.\, \lambda x. if(isZero(x))(1)(x * g (pred x)) \\
+\text{fact} &:= Y(factish) \\
+\text{fact}(0) &:= factish(Y(factish))(0) = if(isZero(0))(1)(fact 0) \\
+               &= 1 \\
+\text{fact}(2) &:= factish(fact)(2) = if(isZero(2))(1)(2 * fact 1) = 2 * (fact 1) \\
+               &= 2 * (if(isZero(1))(1)(1 * fact 0)) \\
+	       &= 2 * 1 * 1
+\end{align*}
+
+
+* Bigger and scarier numbers
+(here we'll put exponents and factorial and maybe ackerman)
+Multiplication was repeated addition, exponentiation is repeated multiplication
+
+\begin{align*}
+  m^n &:= n(*(m))(1) \\
+  1^1 &= 1(*(1))(1) = 1*1 = 1 \\
+  3^2 &= 2(*(3))(1) = 3 * (3 * 1) = 9 \\
+\end{align*}
+
+* Pairs								      :slide:
+Pair types (two things joined together):
+
+\begin{align*}
+  \text{pair} &:= \lambda l. \, \lambda r.\, \lambda p.\, p(l)(r) \\
+  \text{fst} &:= \lambda p. p (\lambda l.\, \lambda r.\, l) \\
+  \text{snd} &:= \lambda p. p (\lambda l.\, \lambda r.\, r)
+\end{align*}
+
+We could also have written:
+
+\begin{align*}
+  \text{fst} &:= \lambda p. p(\text{true}) \\
+  \text{snd} &:= \lambda p. p(\text{false})
+\end{align*}
+* Actions on pairs
+
+* Lists as repeated pairs
+* Representing I/O
+  One of the awkward things in models of computation like this is that it isn't obvious how input and output work.
+
+  Well, the answer is basically that 
+
+* Enriched calculi 
+  Of course we can keep adding things to this calculus
+
+  + strings
+  + efficient numbers
+  + true data structures
+
+but the point is that we don't /have/ to

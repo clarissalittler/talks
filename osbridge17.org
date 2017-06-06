@@ -1,0 +1,173 @@
+#+startup: beamer
+#+TITLE: Lambda Calculi and You
+#+AUTHOR: Clarissa Littler
+#+OPTIONS: H:2 toc:nil
+#+latex_header: \usetheme{Hannover}
+#+latex_header: \usecolortheme{beetle}
+#+LaTeX_CLASS: beamer
+#+LaTeX_CLASS_OPTIONS: [bigger]
+
+* Ideas                                                            :noexport:
+  So this talk is going to fulfill the dual roles of 
+  + introducing the lambda calculus
+  + showing lessons and ideas you can take away from the untyped lambda calculus
+
+  What are the takeaways from the untyped lambda calculus
+  + first class functions are a common language between many programming languages, allowing you to bootstrap your way into unfamiliar syntax
+  + closures are /incredibly/ powerful
+    + use closures whenever you can!
+    + frameworks like React have been learning this by emphasizing functional components over object constructors
+    + closures can be used to make objects and classes
+  + think of data in terms of how it's used
+    + data has an inherent computational content, which is the lesson of Church encodings
+    + think of data in terms of how it should be used, not just what should be stored
+    + you can derive what your functions for using data should look like by thinking of the Church encoding
+** Vague outline
+*** Intro
+    + The lambda calculus
+    + The goals of this talk
+      + introduce you to lambda calculi
+      + data is defined by how its used
+      + closures are more powerful than you might think
+      + desugaring isn't just for React
+      + if you can find the lambda calculus in a language, you can code in it
+    + Lambda calculus
+      + History - Alonzo Church answering questions of computability and proof theory
+      + Syntax - only three forms variables, applications, function abstraction
+      + The computation - in substitution and substitution only
+    + Where's the data?
+      + Church encodings
+      + Booleans
+	+ True
+	+ False
+	+ If statements
+      + Natural numbers
+	+ 0 and suc
+	+ small numerals
+	+ natural numbers as for-loops
+	+ all operations are functions
+      + Lists
+	+ head and tail
+	+ list as fold
+      + Trees
+	+ left and right
+	+ trees are traversals
+    + Adding control
+      + Y-combinators
+    + The power of closures
+      + Stateful variables
+      + Can fake in the lambda calculus
+	+ That's what monads were /actually/ for
+      + Let statements
+      + Lambda + stateful variables = closures
+      + Closures are
+	+ Objects
+	+ Classes
+	+ Modules
+	+ All through the power of functions
+	+ More common knowledge thanks to JavaScript
+    + Learning new languages
+      + If you can find the lambda calculus in a language, you can do almost anything
+      + If you can /translate/ to the lambda calculus, you understand everything
+*** Script
+    We're aiming for about 4-6000 words in order for it to be properly timed
+**** Draft 1
+     Hi everyone! 
+
+     Welcome to this talk I'm glad to be speaking at Open Source Bridge again. This year I'll be giving a talk we're calling "Learn the lambda calculus and be a better programmer". It's a bold title to be sure, but I'm hoping we'll be able to back up that claim. 
+
+     So we're going to cover a few things today. First, what exactly /is/ the lambda calculus? Then the bulk of our talk we'll be covering how one /programs/ in it. Then finally we'll be applying these ideas to the larger programming world and exploring how understanding lambda calculi in general will help you bridge common ground between all the languages you ever need to learn.
+
+     Obviously, the first question is what I even mean by "lambda calculus". Actually, it's more appropriate to same lambda /calculi/ because it's actually an entire family of formal pen-and-paper systems of computation. We'll be starting with the most basic one: the /untyped lambda calculus/.
+
+     The untyped lambda calculus was an invention of Alonzo Church, Alan Turing's thesis advisor (double check), who was also working on the same problems on the limits of computation that caused his student to invent the Turing machine. While Turing machines model computation in a very mechanical, physical, way Church's lambda calculus was a pen & paper equational thing that is closer to an actual programming language.
+
+     I mean, it's not /that/ close to a programming language as you might be used to. This is an example of how the lambda calculus would encode the factorial function! (picture)
+
+     To me, this looks like a math class more than a programming class! That's not a coincidence as Church was a mathematician writing for other mathematicians about what can be theoretically calculated by an algorithm. I doubt he had anything like a modern computer in mind, given than at the time "computer" was still a job title you gave to people who worked through complex calculations for a living.
+
+     How does the untyped lambda calculus work? It's has a /very/ simple syntax: only three forms. Those are (1) lambda abstraction, which is how you /create/ functions, (2) application, which is how you use functions, and variables.
+
+     If you're not used to variables in a /functional/ language I want to clarify that these variables can't actually change value over the course of the program. They're like the parameters of a function in a call-by-value language not like the mutable variables of a Python, C-family language, etc. 
+
+     We should also point out that for now there's no such thing as multi-argument functions. In the untyped lambda calculus, a 
+
+     So here's about the simplest possible function you can create in the lambda calculus: the /identity/ function. It has the incredibly important role of being a function that does nothing at all to its argument.
+     (\x. x)
+     We write function applications just by adjacency so to apply the identity function to a term /a/ you'd write (\x. x) a.
+
+     The final thing we need to explain is how to evaluate code. There's only one thing that can happen in a lambda calculus program: functional evaluation. To evaluate a function application or function call you /substitute/ in the value forthe variable everywhere. This really isn't very different than how function applications work in any programming language
+     If you had a chunk of Python code like this
+ #+BEGIN_SRC python :exports code :results output
+   def funk(f,a,b):
+       print(f(a))
+       print(f(b))
+
+   def dub(x):
+       return (x + x)
+    
+   funk(dub,2,4)
+ #+END_SRC
+
+ #+RESULTS:
+ : 4
+ : 8
+
+   How does the function call to =funk= look after substituting in the arguments? Well it becomes something kinda like
+
+ #+BEGIN_SRC python :exports code :results output
+   def funk(f,a,b):
+       print(f(a))
+       print(f(b))
+
+   def dub(x):
+       return (x + x)
+    
+   print(dub(2))
+   print(dub(4))
+ #+END_SRC
+
+That's not /exactly/ a perfect analogy but you can get the rough picture of how it works at least. The important thing is that substitution at the end of the day is pretty straightforward.
+
+I say /pretty/ straightforward because the actual details of defining substitution in the lambda calculus, which is specifically called "capture-avoiding substitution", is the plugging-in-a-USB-cord of programming language design. No one ever does it right on the first try. You'll mess up. Mess up again. Then try to go back to your first mistake and probably fix it. All that being said, we're going to avoid the details of substition in this talk. The overall concepts are simple, but Legion is waiting in the details. 
+
+So we've already said (EDIT: no we didn't) that the untyped lambda calculus  
+
+* What's the Untyped Lambda Calculus?
+** Introduction 
+** A brief history
+** A language of functions
+** Simple syntax
+** Evaluating
+* Control flow = data
+** What about data?
+** Natural numbers
+** For-loops
+*** 
+Natural numbers /are/ for-loops
++ 10 /is/ the function for performing an action 10 times
+** Booleans
+** If-statements
+*** 
+Booleans themselves are the if-statements
+** Lists
+** For-in/fold/reduce
+** Characters
+** Strings
+* Closures and objects
+** Objects and dispatch
+** Data hiding with closures
+** Classes and closures
+** Encoding prototypes
+* Finding lambda calculi
+** Ruby
+** Python
+** C#
+** JavaScript
+** Lambda calculi won
+* Wrap-up
+** Further reading
+** Questions
+#+BEGIN_EXPORT latex
+{\Huge Any Questions?}
+#+END_EXPORT

@@ -1,0 +1,109 @@
+#+TITLE: If all math was computable...
+#+AUTHOR: Clarissa Littler
+#+OPTIONS: H:2 toc:nil
+#+startup: beamer
+#+BEAMER_THEME: Madrid
+#+LaTeX_CLASS: beamer
+
+
+* Script                                                           :noexport:
+** Version 1
+  Hi everyone!
+  So let's start by imagining a fantasy world. A world where everything that a mathematician can write down, a computer can do. 
+
+  In this world, you are a programmer. You learned programming in your formal logic classes in your undergraduate major of mathematics. In these math classes, you learned all of the techniques you need to write efficient effective code.
+  
+  You sit down to work and turn on your computer. After turning on nearly instantly, it has already gone through all of the files on your system and checked them for viruses, using a program you wrote, and reporting that no virus is on your machine. It took awhile for you to figure out what the exact right definition of "virus" should be, but once you wrote down the predicate in your notebook it was then trivial to write the definition of your program. The code fits on a couple of pages, which is a little longer than you'd like but your definition of virus is very *very* precise.
+
+  You check your email, but there's only small inconsequential communications in it since no one uses email for anything other than public announcements. I mean, what would you use to protect it? Passwords?! Why would they when any hacker who'd taken 9th grade logic could write a program that would correctly find your password in only a few instructions?
+
+  You do have some special electronic banking, but it involves the special dedicated cable that you had to have installed. The handshake takes place in hardware since software is so easily broken. 
+
+  What is this world like? First, let's introduce a simple concept: the /characteristic/ function.
+
+  The idea of a /characteristic/ function is that it's a mathematical function that returns 0 on 1
+** Version 2
+   Hi everyone! So now for something a little different. We'll be telling a little bit of a fairy tale, a fable, about a world rather different from our own. A world where anything a mathematician can write down can be calculated by a computer.
+
+   You wake up. You're a programmer. You learned how to program the way a lot of folks did: in the formal logic classes you took for your bachelor's in applied mathematics. In these classes, you learned how to define programs by precisely describing exactly what you want to calculate. Given that modern computers can calculate millions of logical predicates per second, efficiency isn't really the same concern it was fifty years ago. 
+
+Your final project in your first programming class was writing down the precise definition of a virus so that you could have a perfect virus scanner. It took a few pages in your notebook, with the trickiest part being writing down what it meant for a program to be self-replicating. Once you had that definition, you just executed a simple program that for every file on your computer determined if it was a virus and, if it was, flagged it for examination later. 
+
+It was one of many cute, solved, problems that you did in your time in school. The first program anyone ever learns is the famous travelling salesman problem, which was the first use of computers that revolutionized optimal delivery routes. All you need to do is logically describe graphs and then define what a Hamiltonian path is and how you measure the length of a path and then, bam, you've got your optimal route.
+
+Being a programmer isn't a terribly lucrative job, but it's one you enjoy because it means that you get to spend a lot of time thinking about math and logic. It does pay well enough, though, that you can afford to get an e-banking dedicated cable installed from your home to your bank. Handling the identification handshake between your computer and the bank's has to be done in hardware, since there's no way to make data safe in software. That's another thing you learned in school: any form of credentials in software can be easily broken. All it would take to defeat a password is to just use the power of Hilbert's \epsilon operator to /choose/ the unique string that satisfies the password check. 
+
+It's honestly pretty similar to how back-engineering of products works. It's a common misconception that you can just completely reinvent products by looking at them, but if you can come up with a comprehensive mathematical model of a product then it's pretty easy to choose /the/ right parameters that make your reverse engineered design identical to the original. 
+
+These thoughts run through your head as you're making your morning cup of coffee and sitting down to work. There's something tickling at your brain though.
+
+All the programs you write are finite in length, or else you couldn't possibly write them. They're written with only a finite number of characters because you only have a finite number of keys on your keyboard. So while there's an infinite number of possible programs, doesn't this mean there's only as many programs as there are integers? 
+
+You remember something else from math class: the proof that there's more real numbers, numbers with decimals, than there are integers. It goes something like "if there were a finite number of decimal numbers, then we should be able to lay them out in an infinite table where the rows are the numbers and the columns are the decimal points. But then we can make a new number by looking at the diagonal of this table and adding "one" to each box, so then we can make a new number that can't possibly in the table because it disagrees with every number in the table by construction.
+
+What if you tried a similar thing with programs? You imagine having a table where the rows are programs that read other programs and return true or false, like your freshman anti-virus project, and the columns are the output of the program on the rows. The diagonal, then, is the output of programs run on themselves: p_i(p_i). 
+
+But wait, you can write a program that disagrees with the diagonal on every program: \forall p. \not(p(p)). That's a program and you can write it, but it can't possibly be in the table.
+
+But that's only possible if either there's more than countable programs, which isn't true, or if \forall p. \not(p(pp)) *isn't a program* 
+
+How could it not be a program? It is. You've written it down. You can run it. The only way it couldn't be a program is if...
+
+is if...
+
+Oh my god...
+
+You wake up. You're a programmer. You are in a world where the programs computers can run are an infinitesimal fraction of the things that a logician can define. Things like perfect virus scanners or code breakers that can correctly find passwords in a single step are logically impossible. Problems like the travelling salesman are not trivial first programming assignments, but problems that while solvable are so computationally difficult that you can't run them in your lifetime for a truly complicated roadmap. 
+
+The very nature of programs as finite lists of instructions creates this deep, fundamental, restriction on what they can or can't do. 
+
+As frustrating as it might be, you find yourself grateful because it makes your job so much more interesting.
+
+You go to work. 
+
+
+* Talk
+
+** You wake up
+** Programming class
+*** 
+** Anti-virus
+*** A virus is a self-replicating program
+
+** The new Hello World
+*** Travelling Salesman
+file:2000px-Hamiltonian_path.svg.png
+** Banking
+*** Dedicated lines
+file:Telegraph_Cable_Office.jpg
+** Who uses passwords?
+*** 
+** Choice
+** Reverse engineering
+** Intellectual property
+file:Felix_3D_Printer_-_Printing_Head.JPG
+** ...wait?
+*** 
+Something occurs to you
+** Finite programs
+*** 
+Finite keyboards + finite length = countable number of programs
+** Reals and Integers
+*** All the real numbers between 0 and 1
+ | $a_1$ | $a_2$ | $a_3$ | $a_4$ | ... |
+ | $b_1$ | $b_2$ | $b_3$ | $b_4$ | ... |
+ | $c_1$ | $c_2$ | $c_3$ | $c_4$ | ... |
+ | $d_1$ | $d_2$ | $d_3$ | $d_4$ | ... |
+ | ...   | ...   | ...   | ...   | ... |
+** A table of programs
+** If we fuss with the diagonal
+** A program that can't exist
+** You wake up
+** The Real World: Programming is *hard*
+** The Real World: Programming is *finite*
+*** The finite nature of 
+** Thank you
+*** 
+ #+LaTeX: {\Huge
+ Thank you for coming out!
+ #+LaTeX: }
