@@ -136,7 +136,9 @@ So we've already said (EDIT: no we didn't) that the untyped lambda calculus
 
 * Introduction
 ** What you'll learn
-   What the $\lambda$ calculus is, how to calculate with it, and lessons to draw from it 
+   What the $\lambda$ calculus is, how to calculate with it, and lessons to draw from it \\
+   \\
+   slides available at: https://github.com/clarissalittler/talks/
 ** History of $\lambda$ calculus
 ***                                                               :B_columns:
     :PROPERTIES:
