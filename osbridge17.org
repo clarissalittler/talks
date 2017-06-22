@@ -3,7 +3,8 @@
 #+AUTHOR: Clarissa Littler
 #+OPTIONS: H:2 toc:nil
 #+latex_header: \usetheme{Hannover}
-#+latex_header: \usecolortheme{beetle}
+#+latex_header: \usecolortheme{rose}
+#+LaTeX_HEADER: \usepackage{minted}
 #+LaTeX_CLASS: beamer
 #+LaTeX_CLASS_OPTIONS: [bigger]
 
@@ -133,41 +134,306 @@ I say /pretty/ straightforward because the actual details of defining substituti
 
 So we've already said (EDIT: no we didn't) that the untyped lambda calculus  
 
-* What's the Untyped Lambda Calculus?
-** Introduction 
-** A brief history
-** A language of functions
-** Simple syntax
-** Evaluating
-* Control flow = data
-** What about data?
+* Introduction
+** What you'll learn
+   What the $\lambda$ calculus is, how to calculate with it, and lessons to draw from it 
+** History of $\lambda$ calculus
+***                                                               :B_columns:
+    :PROPERTIES:
+    :BEAMER_env: columns
+    :END:
+****                                                                  :BMCOL:
+     :PROPERTIES:
+     :BEAMER_col: 0.45
+     :END:
+file:~/Pictures/Church.jpeg
+****                                                                  :BMCOL:
+     :PROPERTIES:
+     :BEAMER_col: 0.45
+     :END:
+#+BEGIN_EXPORT latex
+$\textasciicircum{} \rightarrow \Lambda \rightarrow \lambda$
+#+END_EXPORT
+* Syntax and calculation
+** What is it?
+  + $\lambda x. M$
+  + $M N$
+  + $x$
+** Let's break it down
+#+BEGIN_EXPORT latex
+$\lambda x. M$
+#+END_EXPORT
+
+#+BEGIN_EXAMPLE
+function (x) {
+  M
+}
+
+(lambda x: M)
+
+{ |x| M}
+#+END_EXAMPLE
+** Sample programs
+#+BEGIN_EXPORT latex
+\begin{align*}
+  \text{id} &= \lambda x. x \\
+  \text{double} &= \lambda f. \lambda x. f (f\,x) \\
+  \text{if} &= \lambda b. \lambda t. \lambda f. b\,t\,f \\
+\end{align*}
+#+END_EXPORT
+** Substitution: where computation happens
+#+BEGIN_EXPORT latex
+$(\lambda x. M) N \rightarrow N[M/x]$
+#+END_EXPORT
+** You've seen this
+#+BEGIN_SRC python :exports code
+  def sillyFun(x):
+      y = x + 2
+      print(y)
+      return (x*x)
+#+END_SRC
+
+** You've seen this
+#+BEGIN_SRC python :exports code
+  sillyFun(3):
+    y = 3 + 2
+    print(y)
+    return (3 * 3)
+#+END_SRC
+** Evaluation order
+*** Functions before arguments
+#+BEGIN_EXPORT latex
+$M N \rightarrow (\lambda x. l) N$
+#+END_EXPORT
+** Capture avoidance
+*** 
+#+BEGIN_EXPORT latex
+$(\lambda x. \lambda y. x\, y) y \rightarrow \lambda y. y\, y$ 
+#+END_EXPORT
+
+But /that/ can't be right!
+** Rename variables
+*** 
+#+BEGIN_EXPORT latex
+$(\lambda x. \lambda z. x\, z) y \rightarrow \lambda z. y\, z$ 
+#+END_EXPORT
+** Can't get it right
+#+ATTR_LATEX: :width 5cm
+file:~/Pictures/USB.png
+** Is this a real language?
+*** 
+Believe it or not, everything we need is here
+* Code is data
+** Church encodings
+Church encodings are representations of /data/ as /functions/ that use the data
 ** Natural numbers
-** For-loops
 *** 
-Natural numbers /are/ for-loops
-+ 10 /is/ the function for performing an action 10 times
+Numbers are functions of the form $\lambda s. \lambda z. ??$
+*** 
+$0 := \lambda s. \lambda z. z$
+
+$S := \lambda n. \lambda s. \lambda z. s (n\, s\, z)$
+** How are *these* numbers?
+$1 := S(0) = \lambda s. \lambda z. s (0\, s\, z) = \lambda s. \lambda z. s\, z$
+
+$2 := S(1) = \lambda s. \lambda z. s (1\, s\, z) = \lambda s. \lambda z. s (s\,z)$
+** The meaning of a natural number
+   The number =N= represents doing /something/ =N= times
+   \\
+   \\
+   $\text{double} = 2$
+** Definite iteration
+   Natural numbers encapsulate the act of definite iteration
+   
+** Arithmetic
+#+BEGIN_EXPORT latex
+\begin{align*}
+m + n &:= m(S)(n) \\
+1 + 1 &= 1(S)(1) = S(1) = 2 \\
+2 + 2 &= 2(S)(2) = S(S(2)) = 4 \\
+3 + 5 &= 3(S)(5) = S(S(S(5))) = 8
+\end{align*}
+
+\begin{align*}
+ m*n &:= m(n(S))(0) \\
+ 1*1 &= 1(1(S))(0) \\
+     &= 1(S)(0) = S(0) = 1 \\
+ 2*2 &= 2(2(S))(0) \\
+     &= 2(S)(2(S)(0)) = 2(S)(2) = 4  
+\end{align*}
+
+#+END_EXPORT
 ** Booleans
-** If-statements
-*** 
-Booleans themselves are the if-statements
+We represent true and false as /functions/
+#+BEGIN_EXPORT latex
+
+\begin{align*}
+\text{true} &:= \lambda t.\, \lambda f.\, t \\
+\text{false} &:= \lambda t.\, \lambda f.\, f
+\end{align*}
+
+#+END_EXPORT
+
+** The bool is the choice
+if-expression:
+#+BEGIN_EXPORT latex
+
+$$\text{if} := \lambda b.\, \lambda t.\, \lambda f.\, b\,t\,f$$ 
+
+#+END_EXPORT
+examples:
+#+BEGIN_EXPORT latex
+
+\begin{align*}
+\text{if}(\text{true})(x)(y) &= \text{true}(x)(y) = x \\
+\text{if}(\text{false})(x)(y) &= \text{false}(x)(y) = y
+\end{align*}
+
+#+END_EXPORT
+the choice is built into the booleans themselves
+
+** Pairs
+Pair types (two things joined together):
+#+BEGIN_EXPORT latex
+\begin{align*}
+  \text{pair} &:= \lambda l. \, \lambda r.\, \lambda p.\, p(l)(r) \\
+  \text{fst} &:= \lambda p. p (\lambda l.\, \lambda r.\, l) \\
+  \text{snd} &:= \lambda p. p (\lambda l.\, \lambda r.\, r)
+\end{align*}
+#+END_EXPORT
+
+We could also have written:
+#+BEGIN_EXPORT latex
+\begin{align*}
+  \text{fst} &:= \lambda p. p(\text{true}) \\
+  \text{snd} &:= \lambda p. p(\text{false})
+\end{align*}
+#+END_EXPORT
 ** Lists
-** For-in/fold/reduce
-** Characters
-** Strings
-* Closures and objects
-** Objects and dispatch
-** Data hiding with closures
-** Classes and closures
-** Encoding prototypes
-* Finding lambda calculi
-** Ruby
-** Python
-** C#
-** JavaScript
-** Lambda calculi won
-* Wrap-up
-** Further reading
+A list is empty, or an element followed by a list
+
+#+BEGIN_EXPORT latex
+\begin{align*}
+  \text{nil} &:= \lambda c. \lambda n. n \\
+  \text{cons}(x,xs) &:= \lambda c. \lambda n. c\, x (xs\, c\, n)
+\end{align*}
+#+END_EXPORT
+** Understanding reduce/fold
+List with three elements
+#+BEGIN_EXPORT latex
+\begin{align*}
+  ourList :=& cons(1,cons(2,cons(3,nil))) \\
+  ourList(+,0) =& 1 + cons(2,cons(3,nil))(+,0) \\
+               =& 1 + 2 + cons(3,nil)(+,0) \\
+               =& 1 + 2 + 3 + nil(+,0) \\
+               =& 1 + 2 + 3 + 0 \\
+\end{align*}
+#+END_EXPORT
+
+#+BEGIN_SRC js :exports code
+  [1,2,3].reduce(function (x,y) {return x + y},0)
+#+END_SRC
+** A lesson from Church encodings
+  Thinking inductively $\Rightarrow$ modular code
+* Control flow
+** What about control flow?
+*** 
+   We've /almost/ shown Turing completeness
+** Recursion
+#+BEGIN_EXPORT latex
+ $ Y := \lambda f. (\lambda x. f(x\,x)) (\lambda x. f (x\,x))$
+
+#+END_EXPORT
+** A simple proof it works
+#+BEGIN_EXPORT latex
+\begin{align*}
+Y(g) &= (\lambda x.\, g(x x))(\lambda x.\, g(x x)) \\
+     &= g((\lambda x.\, g(x x))(\lambda x.\, g(x x))) \\
+     &= g(Y(g)) 
+\end{align*}
+#+END_EXPORT
+** Sequencing code
+#+BEGIN_EXPORT latex
+\begin{displaymath}
+  l_1;l_2 \Rightarrow (\lambda x. l_2) l_1
+\end{displaymath}
+#+END_EXPORT
+** Variable binding*
+#+BEGIN_EXPORT latex
+\begin{displaymath}
+  \text{let}\, x\,=\,v\, \text{in}\, M \Rightarrow (\lambda x. M) v 
+\end{displaymath}
+#+END_EXPORT
+** Global variable binding*
+Easiest with variable hoisting
+#+BEGIN_EXPORT latex
+\begin{displaymath}
+  \text{var}\,x\,=\,v;M \Rightarrow (\lambda x. M) v
+\end{displaymath}
+#+END_EXPORT
+** Compilation as language design
+You can experiment with features via compilation between languages
+* Lessons learned
+** $\lambda$ : a common language
+*** 
+The $\lambda$ calculus can be found inside many languages
+
+** $\lambda$ : a PL toolkit
+***                                                               :B_columns:
+    :PROPERTIES:
+    :BEAMER_env: columns
+    :END:
+****                                                                  :BMCOL:
+     :PROPERTIES:
+     :BEAMER_col: 0.4
+     :END:
+   The common language of PL researchers
+****                                                                  :BMCOL:
+     :PROPERTIES:
+     :BEAMER_col: 0.4
+     :END:
+
+file:~/Pictures/tapl.jpg
+** $\lambda$ : a way to understand computation
+   Formal mathematical models let us get at the heart of computation
 ** Questions
+*** 
 #+BEGIN_EXPORT latex
 {\Huge Any Questions?}
 #+END_EXPORT
+** Bonus slides
+*** 
+#+BEGIN_EXPORT latex
+{\Huge GUESS WE HAD MORE TIME!}
+#+END_EXPORT
+** What about /mutable variables/?
+***                                                               :B_columns:
+    :PROPERTIES:
+    :BEAMER_env: columns
+    :END:
+****                                                                  :BMCOL:
+     :PROPERTIES:
+     :BEAMER_col: 0.3
+     :END:
+Mutable variables can be /simulated/
+****                                                                  :BMCOL:
+     :PROPERTIES:
+     :BEAMER_col: 0.45
+     :END:
+***** The secret origin of monads
+file:~/Pictures/moggi.png 
+** Closures + state
+***                                                               :B_columns:
+    :PROPERTIES:
+    :BEAMER_env: columns
+    :END:
+****                                                                  :BMCOL:
+     :PROPERTIES:
+     :BEAMER_col: 0.45
+     :END:
+$\lambda$ + state = everything
+****                                                                  :BMCOL:
+     :PROPERTIES:
+     :BEAMER_col: 0.45
+     :END:
+file:~/Pictures/LOL.jpg
