@@ -219,7 +219,7 @@ But /that/ can't be right!
 #+BEGIN_EXPORT latex
 $(\lambda x. \lambda z. x\, z) y \rightarrow \lambda z. y\, z$ 
 #+END_EXPORT
-** Can't get it right
+** Implementing it
 #+ATTR_LATEX: :width 5cm
 file:~/Pictures/USB.png
 ** Is this a real language?
@@ -227,7 +227,7 @@ file:~/Pictures/USB.png
 Believe it or not, everything we need is here
 * Code is data
 ** Church encodings
-Church encodings are representations of /data/ as /functions/ that use the data
+Church encodings are representations of /data/ as /functions/
 ** Natural numbers
 *** 
 Numbers are functions of the form $\lambda s. \lambda z. ??$
@@ -294,13 +294,13 @@ examples:
 #+END_EXPORT
 the choice is built into the booleans themselves
 
-** Pairs
+** Pairs                                                           :noexport:
 Pair types (two things joined together):
 #+BEGIN_EXPORT latex
 \begin{align*}
-  \text{pair} &:= \lambda l. \, \lambda r.\, \lambda p.\, p(l)(r) \\
-  \text{fst} &:= \lambda p. p (\lambda l.\, \lambda r.\, l) \\
-  \text{snd} &:= \lambda p. p (\lambda l.\, \lambda r.\, r)
+  \text{pair} &:= \lambda l. \, \lambda r.\, \lambda p.\, p\,l\,r \\
+  \text{fst} &:= \lambda p. p (\lambda l. \lambda r.\, l) \\
+  \text{snd} &:= \lambda p. p (\lambda l.\lambda r. \, r)
 \end{align*}
 #+END_EXPORT
 
